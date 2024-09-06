@@ -9,12 +9,18 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class POSTCommentSerializer(serializers.ModelSerializer):
     blog_id = serializers.PrimaryKeyRelatedField(source="blog", queryset=Blog.objects.all())
 
     class Meta:
         model = Comment
         fields = ["text", "blog_id"]
+
+
+class GetCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ["text", "id"]
 
 
 class BlogSerializer(serializers.ModelSerializer):

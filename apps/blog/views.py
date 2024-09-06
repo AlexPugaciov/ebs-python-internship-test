@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from apps.blog.models import Blog, Category, Comment
-from apps.blog.serializers import BlogSerializer, CategorySerializer, CommentSerializer
+from apps.blog.serializers import BlogSerializer, CategorySerializer, GetCommentSerializer, POSTCommentSerializer
 from apps.common.permissions import ReadOnly
 
 
@@ -16,7 +16,7 @@ class BlogCreateView(CreateAPIView):
 
 class CommentCreateView(generics.CreateAPIView):
     queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
+    serializer_class = POSTCommentSerializer
 
 
 class BlogDetailView(generics.RetrieveAPIView):
@@ -26,10 +26,15 @@ class BlogDetailView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         blog = self.get_object()
         comments = blog.comments.all()
+        blog_data = BlogSerializer(blog).data
+        blog_data.update(
+            {
+                "comments": GetCommentSerializer(comments, many=True).data,
+            }
+        )
         return Response(
             {
-                "blog": BlogSerializer(blog).data,
-                "comments": CommentSerializer(comments, many=True).data,
+                "blog": blog_data,
             }
         )
 
