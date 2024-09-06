@@ -1,12 +1,32 @@
-from rest_framework import viewsets
-from rest_framework.generics import GenericAPIView, get_object_or_404
+from rest_framework import generics, viewsets
+from rest_framework.generics import CreateAPIView, GenericAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 
-from apps.blog.models import Blog, Category
-from apps.blog.serializers import BlogSerializer, CategorySerializer
+from apps.blog.models import Blog, Category, Comment
+from apps.blog.serializers import BlogSerializer, CategorySerializer, CommentSerializer
 from apps.common.permissions import ReadOnly
+
+
+class BlogCreateView(CreateAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+
+
+class CommentCreateView(generics.CreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+
+class BlogDetailView(generics.RetrieveAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+
+    def get(self, request, *args, **kwargs):
+        blog = self.get_object()
+        comments = blog.comments.all()
+        return Response({"blog": BlogSerializer(blog).data, "comments": CommentSerializer(comments, many=True).data})
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
