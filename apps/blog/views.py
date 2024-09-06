@@ -26,7 +26,12 @@ class BlogDetailView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         blog = self.get_object()
         comments = blog.comments.all()
-        return Response({"blog": BlogSerializer(blog).data, "comments": CommentSerializer(comments, many=True).data})
+        return Response(
+            {
+                "blog": BlogSerializer(blog).data,
+                "comments": CommentSerializer(comments, many=True).data,
+            }
+        )
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
